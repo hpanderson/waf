@@ -268,8 +268,6 @@ def boost_get_libs(self, *k, **kw):
 			t.append('-mt')
 		if kw.get('abi', None):
 			t.append('%s%s' % (is_static and '-s' or '-', kw['abi']))
-		elif is_static:
-			t.append('-s')
 		tags_pat = t and ''.join(t) or ''
 		ext = is_static and self.env.cxxstlib_PATTERN or self.env.cxxshlib_PATTERN
 		ext = ext.partition('%s')[2] # remove '%s' or 'lib%s' from PATTERN
