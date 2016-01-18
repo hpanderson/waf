@@ -37,10 +37,10 @@ def wix(self):
 	wxl = []
 	rest = []
 	for x in self.source:
-		if x.endswith('.wxobj'):
+		if x.endswith('.wixobj'):
 			wxobj.append(x)
 		elif x.endswith('.wxs'):
-			wxobj.append(self.path.find_or_declare(x[:-4]+'.wxobj'))
+			wxobj.append(self.path.find_or_declare(x[:-4]+'.wixobj'))
 			wxs.append(x)
 		elif x.endswith('.dll'):
 			exts.append(x[:-4])
