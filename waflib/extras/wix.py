@@ -40,7 +40,8 @@ def wix(self):
 		if x.endswith('.wixobj'):
 			wxobj.append(x)
 		elif x.endswith('.wxs'):
-			wxobj.append(self.path.find_or_declare(x[:-4]+'.wixobj'))
+			wxobj_path = os.path.join(self.path.bld_dir(), os.path.splitext(os.path.basename(x))[0] + '.wixobj')
+			wxobj.append(self.path.find_or_declare(wxobj_path))
 			wxs.append(x)
 		elif x.endswith('.dll'):
 			exts.append(x[:-4])
