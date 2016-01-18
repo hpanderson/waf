@@ -18,10 +18,11 @@ from waflib import Task
 from waflib.Utils import winreg
 
 class candle(Task.Task):
-	run_str = '${CANDLE} -nologo ${CANDLEFLAGS} -out ${TGT} ${SRC[0].abspath()}',
+	# note that -out needs a trailing slash, or you'll get a CNDL0001 error
+	run_str = '${CANDLE} -nologo ${CANDLEFLAGS} -out ${TGT[0].bld_dir() + "/"} ${SRC}',
 
 class light(Task.Task):
-	run_str = "${LIGHT} -nologo -b ${SRC[0].parent.abspath()} ${LIGHTFLAGS} -out ${TGT} ${SRC[0].abspath()}"
+	run_str = "${LIGHT} -nologo -b ${SRC[0].parent.abspath()} ${LIGHTFLAGS} -out ${TGT} ${SRC}"
 
 @TaskGen.feature('wix')
 @TaskGen.before_method('process_source')
