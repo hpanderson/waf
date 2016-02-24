@@ -10,6 +10,10 @@ Windows Installer XML Tool (WiX)
 bld(features='wix', some.wxs, gen='some.msi', candleflags=[..], lightflags=[..])
 
 bld(features='wix', source=['bundle.wxs','WixBalExtension'], gen='setup.exe', candleflags=[..])
+
+Note that the candle/light tasks are set to always run, since the wix files may
+references install files that waf is not aware of. A better way to handle this
+would be to pass those files in as sources and use the built-in dependency checking. -hpa
 """
 
 import os, copy
@@ -20,9 +24,16 @@ from waflib.Utils import winreg
 class candle(Task.Task):
 	# note that -out needs a trailing slash, or you'll get a CNDL0001 error
 	run_str = '${CANDLE} -nologo ${CANDLEFLAGS} -out ${TGT[0].bld_dir() + "/"} ${SRC}',
+	def runnable_status(self):
+		return Task.RUN_ME
 
 class light(Task.Task):
 	run_str = "${LIGHT} -nologo -b ${SRC[0].parent.abspath()} ${LIGHTFLAGS} -out ${TGT} ${SRC}"
+	def runnable_status(self):
+		for t in self.run_after:
+			if not t.hasrun:
+				return Task.ASK_LATER
+		return Task.RUN_ME
 
 @TaskGen.feature('wix')
 @TaskGen.before_method('process_source')
@@ -55,6 +66,7 @@ def wix(self):
 
 	cndl = self.create_task('candle', self.to_nodes(wxs), self.to_nodes(wxobj))
 	lght = self.create_task('light', self.to_nodes(wxobj), self.path.find_or_declare(self.gen))
+	lght.set_run_after(cndl)
 
 	cndl.env.CANDLEFLAGS = copy.copy(getattr(self,'candleflags',[]))
 	lght.env.LIGHTFLAGS = copy.copy(getattr(self,'lightflags',[]))
